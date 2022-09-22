@@ -1,5 +1,5 @@
 set -o errexit
 
-pip install -r requeriments.txt
+pip install -r requiriments.txt
 pippython manage.py collectstatic --no-input
 python manage.py migrate
