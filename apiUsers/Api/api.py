@@ -18,6 +18,7 @@ from apiUsers.models import Usuario
 from .Serializers import Usuarioserializer
 from datetime import datetime
 from django.http import JsonResponse
+from rest_framework.decorators import api_view
 
 
 class CiudadAPIView(APIView):
@@ -77,22 +78,31 @@ class PacienteAPIView(APIView):
                 "messege": "Ha ocurrido un error",
                 "response": []
             })
-
-    def getById(request, patient_id):
+@api_view(['GET','PUT'])
+def editbyid(request, patient_id):
+    if request.method=='GET':
         patients = Paciente.objects.filter(id=patient_id)
         patients_serializer = Pacienteserializer(patients, many=True)
         data = patients_serializer.data
         if len(data) > 0:
             return JsonResponse({
-                "status": "true",
-                "message": "Se ha encontrado con éxito",
-                "response": data})
+                    "status": "true",
+                    "message": "Se ha encontrado con éxito",
+                    "response": data})
         else:
             return JsonResponse({
-                "status": "true",
-                "messege": "No se encontraron registros",
-                "response": []
-            })
+                    "status": "true",
+                    "messege": "No se encontraron registros",
+                    "response": []
+                })
+    elif request.method=='PUT':
+        patient = Paciente.objects.filter(id=patient_id).first()
+        patient_serializer = Pacienteserializer(patient,data=request.data)
+        if patient_serializer.is_valid():
+            patient_serializer.save()
+            return Response (patient_serializer.data)
+        else:
+            return Response(patient_serializer.errors)
         
 
     def post(self, request):
@@ -127,6 +137,10 @@ class PacienteAPIView(APIView):
                 "messege": "Ha ocurrido un error",
                 "response": []
             })
+
+    
+
+
 
 
 class MedicoAPIView(APIView):
