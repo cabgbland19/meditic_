@@ -1,3 +1,4 @@
+from requests import delete
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from apiUsers.models import Ciudad
@@ -78,31 +79,7 @@ class PacienteAPIView(APIView):
                 "messege": "Ha ocurrido un error",
                 "response": []
             })
-@api_view(['GET','PUT'])
-def editbyid(request, patient_id):
-    if request.method=='GET':
-        patients = Paciente.objects.filter(id=patient_id)
-        patients_serializer = Pacienteserializer(patients, many=True)
-        data = patients_serializer.data
-        if len(data) > 0:
-            return JsonResponse({
-                    "status": "true",
-                    "message": "Se ha encontrado con éxito",
-                    "response": data})
-        else:
-            return JsonResponse({
-                    "status": "true",
-                    "messege": "No se encontraron registros",
-                    "response": []
-                })
-    elif request.method=='PUT':
-        patient = Paciente.objects.filter(id=patient_id).first()
-        patient_serializer = Pacienteserializer(patient,data=request.data)
-        if patient_serializer.is_valid():
-            patient_serializer.save()
-            return Response (patient_serializer.data)
-        else:
-            return Response(patient_serializer.errors)
+
         
 
     def post(self, request):
@@ -137,6 +114,36 @@ def editbyid(request, patient_id):
                 "messege": "Ha ocurrido un error",
                 "response": []
             })
+
+@api_view(['GET','PUT','DELETE'])
+def editbyid(request, patient_id):
+    if request.method=='GET':
+        patients = Paciente.objects.filter(id=patient_id)
+        patients_serializer = Pacienteserializer(patients, many=True)
+        data = patients_serializer.data
+        if len(data) > 0:
+            return JsonResponse({
+                    "status": "true",
+                    "message": "Se ha encontrado con éxito",
+                    "response": data})
+        else:
+            return JsonResponse({
+                    "status": "true",
+                    "messege": "No se encontraron registros",
+                    "response": []
+                })
+    elif request.method=='PUT':
+        patient = Paciente.objects.filter(id=patient_id).first()
+        patient_serializer = Pacienteserializer(patient,data=request.data)
+        if patient_serializer.is_valid():
+            patient_serializer.save()
+            return Response (patient_serializer.data)
+        else:
+            return Response(patient_serializer.errors)
+    elif request.method=='DELETE':
+        patient = Paciente.objects.filter(id=patient_id).first()
+        patient.delete()
+        return Response('user removed')
 
     
 
